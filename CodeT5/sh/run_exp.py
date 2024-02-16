@@ -101,13 +101,12 @@ def get_args_by_task_model(task, sub_task, model_tag):
 
 def run_one_exp(args):
     bs, lr, src_len, trg_len, patience, epoch = get_args_by_task_model(args.task, args.sub_task, args.model_tag)
-    print(f'============================Start Running, Local_Rank:{args.local_rank}==========================')
     cmd_str = get_cmd(task=args.task, sub_task=args.sub_task, model_tag=args.model_tag, gpu=args.gpu,
                       data_num=args.data_num, bs=bs, lr=lr, source_length=src_len, target_length=trg_len,
                       patience=patience, epoch=epoch, warmup=1000,
                       model_dir=args.model_dir, summary_dir=args.summary_dir,local_rank=args.local_rank,
                       res_fn='{}/{}_{}.txt'.format(args.res_dir, args.task, args.model_tag))
-    print('%s\n' % cmd_str)
+    # print('%s\n' % cmd_str)
     os.system(cmd_str)
 
 
@@ -120,14 +119,13 @@ def run_multi_task_exp(args):
 
     if args.data_num != -1:
         max_steps, save_steps, log_steps = 1000, 200, 50
-    print('============================Start Running==========================')
     cmd_str = get_cmd(task='multi_task', sub_task='none', model_tag=args.model_tag, gpu=args.gpu,
                       data_num=args.data_num, bs=bs, lr=lr, source_length=-1, target_length=-1,
                       patience=-1, epoch=-1, warmup=1000,
                       model_dir=args.model_dir, summary_dir=args.summary_dir,
                       res_fn='{}/multi_task_{}.txt'.format(args.res_dir, args.model_tag),
                       max_steps=max_steps, save_steps=save_steps, log_steps=log_steps)
-    print('%s\n' % cmd_str)
+    # print('%s\n' % cmd_str)
     os.system(cmd_str)
 
 

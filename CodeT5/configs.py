@@ -117,7 +117,6 @@ def add_args(parser):
 
 
 def set_dist(args):
-    print(f'======================SETTING DIST, local_rank:{args.local_rank}===============')
     # Setup CUDA, GPU & distributed training
     if args.local_rank == -1 or args.no_cuda:
         device = torch.device("cuda" if torch.cuda.is_available() and not args.no_cuda else "cpu")
@@ -129,8 +128,6 @@ def set_dist(args):
         torch.distributed.init_process_group(backend='nccl')
         args.n_gpu = 1
     cpu_cont = multiprocessing.cpu_count()
-    logger.warning("Process rank: %s, device: %s, n_gpu: %s, distributed training: %s, cpu count: %d",
-                   args.local_rank, device, args.n_gpu, bool(args.local_rank != -1), cpu_cont)
     args.device = device
     args.cpu_cont = cpu_cont
 
