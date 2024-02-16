@@ -66,9 +66,9 @@ def add_args(parser):
     parser.add_argument("--no_cuda", action='store_true',
                         help="Avoid using CUDA when available")
 
-    parser.add_argument("--train_batch_size", default=8, type=int,
+    parser.add_argument("--train_batch_size", default=4, type=int,
                         help="Batch size per GPU/CPU for training.")
-    parser.add_argument("--eval_batch_size", default=8, type=int,
+    parser.add_argument("--eval_batch_size", default=4, type=int,
                         help="Batch size per GPU/CPU for evaluation.")
     parser.add_argument('--gradient_accumulation_steps', type=int, default=1,
                         help="Number of updates steps to accumulate before performing a backward/update pass.")
@@ -106,11 +106,18 @@ def add_args(parser):
     elif args.task == 'defect':
         args.lang = 'c'
     elif args.task == 'translate':
-        args.lang = 'c_sharp' if args.sub_task == 'java-cs' else 'java'
+        #args.lang = 'c_sharp' if args.sub_task == 'java-cs' else 'java'
+        if args.sub_task == 'java-cs' :
+            args.lang = 'c_sharp'
+        elif args.sub_task == 'cs-java' :
+            args.lang = 'java'
+        else :
+            args.lang = 'rust'
     return args
 
 
 def set_dist(args):
+    print(f'======================SETTING DIST, local_rank:{args.local_rank}===============')
     # Setup CUDA, GPU & distributed training
     if args.local_rank == -1 or args.no_cuda:
         device = torch.device("cuda" if torch.cuda.is_available() and not args.no_cuda else "cpu")

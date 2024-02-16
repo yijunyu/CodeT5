@@ -113,7 +113,7 @@ def load_and_cache_multi_gen_data(args, pool, tokenizer, split_tag, only_src=Fal
             if task == 'summarize':
                 sub_tasks = ['ruby', 'javascript', 'go', 'python', 'java', 'php']
             elif task == 'translate':
-                sub_tasks = ['java-cs', 'cs-java']
+                sub_tasks = ['java-cs', 'cs-java', 'c-rust']
             elif task == 'refine':
                 sub_tasks = ['small', 'medium']
             else:
@@ -191,10 +191,15 @@ def get_filenames(data_root, task, sub_task, split=''):
             train_fn = '{}/train.java-cs.txt.cs,{}/train.java-cs.txt.java'.format(data_dir, data_dir)
             dev_fn = '{}/valid.java-cs.txt.cs,{}/valid.java-cs.txt.java'.format(data_dir, data_dir)
             test_fn = '{}/test.java-cs.txt.cs,{}/test.java-cs.txt.java'.format(data_dir, data_dir)
-        else:
+        elif sub_task == 'java-cs':
             train_fn = '{}/train.java-cs.txt.java,{}/train.java-cs.txt.cs'.format(data_dir, data_dir)
             dev_fn = '{}/valid.java-cs.txt.java,{}/valid.java-cs.txt.cs'.format(data_dir, data_dir)
             test_fn = '{}/test.java-cs.txt.java,{}/test.java-cs.txt.cs'.format(data_dir, data_dir)
+        else :
+            train_fn = '{}/train.c-rust.txt.c,{}/train.c-rust.txt.rs'.format(data_dir, data_dir)
+            dev_fn = '{}/valid.c-rust.txt.c,{}/valid.c-rust.txt.rs'.format(data_dir, data_dir)
+            test_fn = '{}/test.c-rust.txt.c,{}/test.c-rust.txt.rs'.format(data_dir, data_dir)
+            print(f'==============train_fn:{train_fn}, dev_fn:{dev_fn}, test_fn:{test_fn}===========')
     elif task == 'clone':
         data_dir = '{}/{}'.format(data_root, task)
         train_fn = '{}/train.txt'.format(data_dir)

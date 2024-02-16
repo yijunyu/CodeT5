@@ -72,7 +72,7 @@ def get_bs(cur_task, model_tag):
     if 'codet5_small' in model_tag:
         bs = 32
         if task == 'summarize' or task == 'translate' or (task == 'refine' and sub_task == 'small'):
-            bs = 64
+            bs = 16
     else:
         # codet5_base
         bs = 28

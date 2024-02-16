@@ -1,14 +1,15 @@
 #!/usr/bin/env python
 import os
 import argparse
+os.environ['CURL_CA_BUNDLE'] = ''
 
 
 def get_cmd(task, sub_task, model_tag, gpu, data_num, bs, lr, source_length, target_length, patience, epoch, warmup,
-            model_dir, summary_dir, res_fn, max_steps=None, save_steps=None, log_steps=None):
+            model_dir, summary_dir, res_fn, max_steps=None, save_steps=None, log_steps=None, local_rank=-1):
     if max_steps is None:
-        cmd_str = 'bash exp_with_args.sh %s %s %s %d %d %d %d %d %d %d %d %d %s %s %s' % \
+        cmd_str = 'bash exp_with_args.sh %s %s %s %d %d %d %d %d %d %d %d %d %s %s %s %d' % \
                   (task, sub_task, model_tag, gpu, data_num, bs, lr, source_length, target_length, patience, epoch,
-                   warmup, model_dir, summary_dir, res_fn)
+                   warmup, model_dir, summary_dir, res_fn, local_rank)
     else:
         cmd_str = 'bash exp_with_args.sh %s %s %s %d %d %d %d %d %d %d %d %d %s %s %s %d %d %d' % \
                   (task, sub_task, model_tag, gpu, data_num, bs, lr, source_length, target_length, patience, epoch,
@@ -77,11 +78,12 @@ def get_args_by_task_model(task, sub_task, model_tag):
         elif task == 'clone':
             bs = 25
     elif 'codet5_large' in model_tag:
-        bs = 8
+        bs = 4
     else:
         bs = 32
         if task == 'translate':
-            bs = 25
+            #bs = 25
+            bs = 20
         elif task == 'summarize':
             bs = 48
         elif task == 'clone':
@@ -99,11 +101,11 @@ def get_args_by_task_model(task, sub_task, model_tag):
 
 def run_one_exp(args):
     bs, lr, src_len, trg_len, patience, epoch = get_args_by_task_model(args.task, args.sub_task, args.model_tag)
-    print('============================Start Running==========================')
+    print(f'============================Start Running, Local_Rank:{args.local_rank}==========================')
     cmd_str = get_cmd(task=args.task, sub_task=args.sub_task, model_tag=args.model_tag, gpu=args.gpu,
                       data_num=args.data_num, bs=bs, lr=lr, source_length=src_len, target_length=trg_len,
                       patience=patience, epoch=epoch, warmup=1000,
-                      model_dir=args.model_dir, summary_dir=args.summary_dir,
+                      model_dir=args.model_dir, summary_dir=args.summary_dir,local_rank=args.local_rank,
                       res_fn='{}/{}_{}.txt'.format(args.res_dir, args.task, args.model_tag))
     print('%s\n' % cmd_str)
     os.system(cmd_str)
@@ -133,7 +135,7 @@ def get_sub_tasks(task):
     if task == 'summarize':
         sub_tasks = ['ruby', 'javascript', 'go', 'python', 'java', 'php']
     elif task == 'translate':
-        sub_tasks = ['java-cs', 'cs-java']
+        sub_tasks = ['java-cs', 'cs-java', 'c-rust']
     elif task == 'refine':
         sub_tasks = ['small', 'medium']
     elif task in ['concode', 'defect', 'clone', 'multi_task']:
@@ -153,6 +155,7 @@ if __name__ == '__main__':
     parser.add_argument("--summary_dir", type=str, default='tensorboard', help='directory to save tensorboard summary')
     parser.add_argument("--data_num", type=int, default=-1, help='number of data instances to use, -1 for full data')
     parser.add_argument("--gpu", type=int, default=0, help='index of the gpu to use in a cluster')
+    parser.add_argument("--local_rank", type=int, default=-1, help='index of the gpu to use in a cluster')
     args = parser.parse_args()
 
     if not os.path.exists(args.res_dir):

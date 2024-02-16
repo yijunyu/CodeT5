@@ -20,6 +20,7 @@ using a masked language modeling (MLM) loss.
 """
 
 import os
+os.environ['CURL_CA_BUNDLE'] = ''
 import logging
 import argparse
 import math
@@ -363,21 +364,22 @@ def main():
         logger.info("  Batch size = %d", args.eval_batch_size)
 
         for criteria in ['best-bleu']:
-            file = os.path.join(args.output_dir, 'checkpoint-{}/pytorch_model.bin'.format(criteria))
-            logger.info("Reload model from {}".format(file))
-            model.load_state_dict(torch.load(file))
+            # file = os.path.join(args.output_dir, 'checkpoint-{}/pytorch_model.bin'.format(criteria))
+#            file = os.path.join(args.model_name_or_path, 'pytorch_model.bin'.format(criteria))
+#            logger.info("Reload model from {}".format(file))
+#            model.load_state_dict(torch.load(file))
             eval_examples, eval_data = load_and_cache_gen_data(args, args.test_filename, pool, tokenizer, 'test',
                                                                only_src=True, is_sample=False)
             result = eval_bleu_epoch(args, eval_data, eval_examples, model, tokenizer, 'test', criteria)
-            test_bleu, test_em = result['bleu'], result['em']
-            test_codebleu = result['codebleu'] if 'codebleu' in result else 0
-            result_str = "[%s] bleu-4: %.2f, em: %.4f, codebleu: %.4f\n" % (criteria, test_bleu, test_em, test_codebleu)
-            logger.info(result_str)
-            fa.write(result_str)
-            if args.res_fn:
-                with open(args.res_fn, 'a+') as f:
-                    f.write('[Time: {}] {}\n'.format(get_elapse_time(t0), file))
-                    f.write(result_str)
+#            test_bleu, test_em = result['bleu'], result['em']
+#            test_codebleu = result['codebleu'] if 'codebleu' in result else 0
+#            result_str = "[%s] bleu-4: %.2f, em: %.4f, codebleu: %.4f\n" % (criteria, test_bleu, test_em, test_codebleu)
+#            logger.info(result_str)
+#            fa.write(result_str)
+#            if args.res_fn:
+#                with open(args.res_fn, 'a+') as f:
+#                    f.write('[Time: {}] {}\n'.format(get_elapse_time(t0), file))
+#                    f.write(result_str)
     logger.info("Finish and take {}".format(get_elapse_time(t0)))
     fa.write("Finish and take {}".format(get_elapse_time(t0)))
     fa.close()
